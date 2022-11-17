@@ -1,9 +1,17 @@
-import Categories from './components/categories/categories.component';
+import Home from './components/routes/home/home.component';
+import Navigation from './components/routes/navigation/navigation.component';
+import { Routes, Route } from 'react-router-dom';
+import SignIn from './components/routes/sign-in/sign-in.component';
 
 const App = () => {
 
   return (
-    <Categories/>
+    <Routes>
+	    <Route path='/' element={<Navigation />}>
+        <Route index element={<Home />}/>
+        <Route path='signin' element={<SignIn/>}/>
+      </Route>
+    </Routes>
   );
 }
 
