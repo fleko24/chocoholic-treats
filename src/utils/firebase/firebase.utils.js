@@ -1,6 +1,11 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAuth, signInWithRedirect, signInWithPopup, GoogleAuthProvider } from 'firebase/auth'
+import { getAuth, 
+         //signInWithRedirect, 
+         signInWithPopup, 
+         GoogleAuthProvider, 
+         createUserWithEmailAndPassword
+        } from 'firebase/auth'
 import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore'; 
 
 // Your web app's Firebase configuration
@@ -25,12 +30,18 @@ export const signInWithGooglePopup = async() => {
   const res = await signInWithPopup(auth, provider);
  return res;
 };
+/* SIGN IN WITH GOOGLE REDIRECT WORKING WELL
+export const signInWithGoogleRedirect = async() => {
+  const res = signInWithRedirect(auth, provider);
+  return res;
+}; */
 export const db = getFirestore();
-export const createUserDocumentFromAuth = async (userAuth) => {
+// additional information for the case I don't get the displayName
+export const createUserDocumentFromAuth = async (userAuth, additionalInformation={}) => {
   const userDocRef = doc(db, 'users', userAuth.uid);
   const userSnapshot = await getDoc(userDocRef);
-  console.log(userSnapshot);
-  console.log(userSnapshot.exists());
+  //console.log(userSnapshot);
+  //console.log(userSnapshot.exists());
 
   if (!userSnapshot.exists()) {
     const {displayName, email} = userAuth;
@@ -39,11 +50,18 @@ export const createUserDocumentFromAuth = async (userAuth) => {
       await setDoc(userDocRef, {
         displayName,
         email,
-        createdAt
+        createdAt,
+        // I spread additionalInformation
+        ...additionalInformation
       });
     } catch (error) {
       console.log('Error, creating new user', error);
     }
   }
   return userDocRef;
+}
+
+export const createAuthUserWithEmailAndPassword = async ( email, password) => {
+  if(!email || !password) return;
+  return await createUserWithEmailAndPassword(auth, email, password);
 }
